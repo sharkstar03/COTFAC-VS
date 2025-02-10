@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Cotización Empresarial{% endblock %}
+{% block title %}Cotización Personal{% endblock %}
 
 {% block content %}
 <div class="flex">
@@ -9,24 +9,19 @@
     <!-- Main Content -->
     <div class="flex-1 p-8">
         <div class="mb-6 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-gray-900">Nueva Cotización Empresarial</h1>
+            <h1 class="text-2xl font-bold text-gray-900">Nueva Cotización Personal</h1>
             <a href="{{ url_for('select_type') }}" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300">
                 <i class="fas fa-arrow-left"></i> Volver
             </a>
         </div>
 
         <div class="bg-white rounded-lg shadow-md p-6">
-            <form action="{{ url_for('generate_pdf_empresa') }}" method="POST" class="space-y-6">
+            <form action="{{ url_for('generate_pdf_natural') }}" method="POST" class="space-y-6">
                 <!-- Información del cliente -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Nombre del Cliente</label>
                         <input type="text" name="nombre" required
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Empresa</label>
-                        <input type="text" name="empresa" required
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                     </div>
                     <div>
@@ -39,32 +34,19 @@
                         <input type="text" name="telefono" required
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                     </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Correo</label>
+                        <input type="email" name="correo"
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    </div>
                 </div>
 
-                <!-- RUC/DV Toggle -->
-                <div class="flex items-center space-x-4">
-                    <label class="flex items-center">
-                        <input type="checkbox" id="toggle-ruc-dv" name="toggle_ruc_dv" class="rounded text-indigo-600">
-                        <span class="ml-2 text-sm text-gray-700">Agregar RUC/DV</span>
-                    </label>
+                <!-- ITBMS Toggle -->
+                <div class="flex items-center">
                     <label class="flex items-center">
                         <input type="checkbox" name="itbms" class="rounded text-indigo-600">
                         <span class="ml-2 text-sm text-gray-700">Incluir ITBMS</span>
                     </label>
-                </div>
-
-                <!-- RUC/DV Fields (hidden by default) -->
-                <div id="ruc-dv-fields" class="hidden grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">RUC</label>
-                        <input type="text" name="ruc" 
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">DV</label>
-                        <input type="text" name="dv"
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                    </div>
                 </div>
 
                 <!-- Items Table -->
@@ -119,14 +101,6 @@
 
 {% block scripts %}
 <script>
-// RUC/DV Toggle
-document.getElementById('toggle-ruc-dv').addEventListener('change', function() {
-    const rucDvFields = document.getElementById('ruc-dv-fields');
-    rucDvFields.classList.toggle('hidden');
-    const inputs = rucDvFields.querySelectorAll('input');
-    inputs.forEach(input => input.required = this.checked);
-});
-
 function agregarItem() {
     const container = document.getElementById('items-container');
     const itemIndex = container.children.length;

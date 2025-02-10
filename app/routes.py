@@ -86,6 +86,20 @@ def register_routes(app):
     def formulario_natural():
         return render_template('formulario_natural.html')
 
+    @app.route('/generate_pdf_empresa', methods=['POST'])
+    @login_required
+    def generate_pdf_empresa():
+        # Lógica para generar PDF de cotización empresarial
+        # ...existing code...
+        return redirect(url_for('dashboard'))
+
+    @app.route('/generate_pdf_natural', methods=['POST'])
+    @login_required
+    def generate_pdf_natural():
+        # Lógica para generar PDF de cotización personal
+        # ...existing code...
+        return redirect(url_for('dashboard'))
+
     @app.route('/buscar')
     @login_required
     def buscar():
