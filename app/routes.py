@@ -185,5 +185,11 @@ def register_routes(app):
         cotizacion.fecha_rechazo = datetime.utcnow()
         db.session.commit()
         return redirect(url_for('buscar'))
+    
+    @app.route('/configuracion')
+    @login_required  # Add login_required decorator if you have authentication
+    def configuracion():
+    # Add any necessary logic for the configuration page
+        return render_template('configuracion.html')
 
     return app

@@ -2,69 +2,119 @@
 {% block title %}Dashboard - COTFAC-VS{% endblock %}
 
 {% block content %}
-<div class="flex min-h-screen bg-gray-100">
+<div class="flex min-h-screen bg-gray-50">
     <!-- Sidebar -->
     {% include 'components/sidebar.html' %}
     
     <!-- Main Content -->
-    <div class="flex-1 p-6 overflow-auto ml-64">
-        <!-- Header -->
-        <div class="mb-6">
-            <h1 class="text-3xl font-bold text-gray-900">Panel de Control</h1>
+    <div class="flex-1 p-4 md:p-8 lg:p-12 overflow-auto ml-64 transition-all duration-300">
+        <!-- Header with Welcome and Date -->
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900">Panel de Control</h1>
+                <p class="text-sm text-gray-600 mt-2" id="currentDateTime">Cargando fecha...</p>
+            </div>
+            <div class="hidden md:block">
+                <button class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors">
+                    <i class="fas fa-plus mr-2"></i>Nuevo
+                </button>
+            </div>
         </div>
 
         <!-- Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
             <!-- Total Ventas -->
-            <div class="bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-xl shadow-md p-6 text-white">
-                <div class="flex items-center justify-between">
-                    <i class="fas fa-dollar-sign text-2xl opacity-80"></i>
-                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
-                        +2.08%
-                    </span>
-                </div>
-                <div class="mt-4">
-                    <h3 class="text-sm font-medium">Total Ventas</h3>
-                    <p class="mt-2 text-3xl font-bold" id="totalVentas">$0.00</p>
-                    <p class="mt-1 text-sm">vs mes anterior</p>
+            <div class="bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 text-white">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <i class="fas fa-chart-line text-3xl opacity-75"></i>
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                            +2.08%
+                        </span>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium opacity-80">Total Ventas</h3>
+                        <p class="mt-2 text-3xl font-bold" id="totalVentas">$0.00</p>
+                        <p class="mt-1 text-xs opacity-70">Comparado con mes anterior</p>
+                    </div>
                 </div>
             </div>
 
             <!-- Total Cotizaciones -->
-            <div class="bg-white rounded-xl shadow-md p-6">
-                <div class="flex items-center justify-between">
-                    <i class="fas fa-file-invoice text-2xl text-gray-400"></i>
+            <div class="bg-white rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-2 transition-all duration-300 p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <i class="fas fa-file-invoice text-3xl text-blue-500"></i>
                     <span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
                         +12.4%
                     </span>
                 </div>
-                <div class="mt-4">
+                <div>
                     <h3 class="text-sm font-medium text-gray-500">Cotizaciones</h3>
                     <p class="mt-2 text-3xl font-bold text-gray-900" id="totalCotizaciones">0</p>
-                    <p class="mt-1 text-sm text-gray-500">vs mes anterior</p>
+                    <p class="mt-1 text-sm text-gray-500">Comparado con mes anterior</p>
                 </div>
             </div>
 
             <!-- Total Facturas -->
-            <div class="bg-white rounded-xl shadow-md p-6">
-                <div class="flex items-center justify-between">
-                    <i class="fas fa-file-invoice-dollar text-2xl text-gray-400"></i>
+            <div class="bg-white rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-2 transition-all duration-300 p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <i class="fas fa-file-invoice-dollar text-3xl text-green-500"></i>
                     <span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
                         +8.2%
                     </span>
                 </div>
-                <div class="mt-4">
+                <div>
                     <h3 class="text-sm font-medium text-gray-500">Facturas</h3>
                     <p class="mt-2 text-3xl font-bold text-gray-900" id="totalFacturas">0</p>
-                    <p class="mt-1 text-sm text-gray-500">vs mes anterior</p>
+                    <p class="mt-1 text-sm text-gray-500">Comparado con mes anterior</p>
                 </div>
             </div>
         </div>
 
-        <!-- Gráfico -->
-        <div class="bg-white rounded-lg shadow-md p-6 h-96">
-            <h3 class="text-lg font-semibold mb-4">Ingresos Mensuales</h3>
-            <canvas id="chart" class="w-full h-full"></canvas>
+        <!-- Charts and Additional Information -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Monthly Income Chart -->
+            <div class="lg:col-span-2 bg-white rounded-lg shadow-md p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-800">Ingresos Mensuales</h3>
+                    <div class="flex space-x-2">
+                        <button class="text-xs px-2 py-1 bg-gray-100 rounded hover:bg-gray-200">1M</button>
+                        <button class="text-xs px-2 py-1 bg-gray-100 rounded hover:bg-gray-200">6M</button>
+                        <button class="text-xs px-2 py-1 bg-indigo-100 text-indigo-700 rounded">1A</button>
+                    </div>
+                </div>
+                <div class="h-80">
+                    <canvas id="monthlyIncomeChart" class="w-full h-full"></canvas>
+                </div>
+            </div>
+
+            <!-- Quick Actions and Notifications -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Acciones Rápidas</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+                        <div class="flex items-center">
+                            <i class="fas fa-plus-circle text-green-500 mr-3"></i>
+                            <span class="text-sm text-gray-700">Crear Cotización</span>
+                        </div>
+                        <button class="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded">Ir</button>
+                    </div>
+                    <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+                        <div class="flex items-center">
+                            <i class="fas fa-file-upload text-blue-500 mr-3"></i>
+                            <span class="text-sm text-gray-700">Subir Factura</span>
+                        </div>
+                        <button class="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded">Ir</button>
+                    </div>
+                    <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+                        <div class="flex items-center">
+                            <i class="fas fa-users text-purple-500 mr-3"></i>
+                            <span class="text-sm text-gray-700">Clientes Nuevos</span>
+                        </div>
+                        <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">3 Nuevos</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -72,9 +122,36 @@
 
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        const ctx = document.getElementById('chart').getContext('2d');
+        // Update date and time
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            document.getElementById('currentDateTime').textContent = now.toLocaleDateString('es-ES', options);
+        }
+        updateDateTime();
+        setInterval(updateDateTime, 60000);
+
+        // Mock data update (replace with actual API calls)
+        document.getElementById('totalVentas').textContent = '$45,678.00';
+        document.getElementById('totalCotizaciones').textContent = '42';
+        document.getElementById('totalFacturas').textContent = '28';
+
+        // Monthly Income Chart
+        const ctx = document.getElementById('monthlyIncomeChart').getContext('2d');
+        const gradientFill = ctx.createLinearGradient(0, 0, 0, 400);
+        gradientFill.addColorStop(0, 'rgba(99, 102, 241, 0.3)');
+        gradientFill.addColorStop(1, 'rgba(99, 102, 241, 0)');
+
         new Chart(ctx, {
             type: 'line',
             data: {
@@ -82,9 +159,12 @@
                 datasets: [{
                     label: 'Ingresos',
                     data: [1200, 1900, 3000, 5000, 2000, 3000, 4000],
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 2,
+                    backgroundColor: gradientFill,
+                    borderColor: 'rgba(99, 102, 241, 1)',
+                    borderWidth: 3,
+                    pointBackgroundColor: 'rgba(99, 102, 241, 1)',
+                    pointBorderColor: 'white',
+                    pointHoverRadius: 6,
                     tension: 0.4
                 }]
             },
@@ -92,7 +172,32 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
-                    y: { beginAtZero: true }
+                    y: { 
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0,0,0,0.05)'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value;
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        titleColor: 'white',
+                        bodyColor: 'white'
+                    }
                 }
             }
         });

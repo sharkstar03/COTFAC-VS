@@ -2,44 +2,86 @@
 {% block title %}Cotización Empresarial{% endblock %}
 
 {% block content %}
-<div class="flex min-h-screen bg-gray-100">
+<div class="flex min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
     <!-- Sidebar -->
-    <div class="w-72 bg-white shadow-md">
+    <div class="w-72 bg-white shadow-lg border-r border-gray-100">
         {% include 'components/sidebar.html' %}
     </div>
     
     <!-- Main Content -->
-    <div class="flex-1 p-10 relative">
-        <div class="mb-6 flex justify-between items-center">
-            <h1 class="text-3xl font-semibold text-gray-900">Nueva Cotización Empresarial</h1>
-            <a href="{{ url_for('select_type') }}" class="bg-gray-200 text-gray-700 px-5 py-3 rounded-lg hover:bg-gray-300">
-                <i class="fas fa-arrow-left"></i> Volver
+    <div class="flex-1 p-6 md:p-10 relative overflow-auto">
+        <div class="mb-6 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            <h1 class="text-2xl md:text-3xl font-bold text-indigo-800">Nueva Cotización Empresarial</h1>
+            <a href="{{ url_for('select_type') }}" class="bg-indigo-50 text-indigo-700 px-4 py-2 rounded-lg hover:bg-indigo-100 transition-colors flex items-center">
+                <i class="fas fa-arrow-left mr-2"></i> Volver
             </a>
         </div>
 
-        <div class="bg-white rounded-xl shadow-lg p-8">
+        <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-gray-100">
             <form id="quotation-form" action="{{ url_for('generate_pdf_empresa') }}" method="POST" class="space-y-8">
                 <!-- Información del cliente -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label for="nombre" class="block text-lg font-medium text-gray-700">Nombre del Cliente</label>
-                        <input id="nombre" type="text" name="nombre" placeholder="Ej: Juan Pérez" autocomplete="off" required class="mt-2 block w-full rounded-lg border-gray-300 shadow-sm px-4 py-3 focus:border-indigo-500 focus:ring-indigo-500">
+                        <label for="nombre" class="block text-md font-semibold text-gray-700 mb-2">Nombre del Cliente *</label>
+                        <input id="nombre" type="text" name="nombre" placeholder="Ej: Juan Pérez" autocomplete="off" required 
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition-all">
+                        <p class="text-xs text-gray-500 mt-1">Nombre completo del contacto principal</p>
                     </div>
                     <div>
-                        <label for="empresa" class="block text-lg font-medium text-gray-700">Empresa</label>
-                        <input id="empresa" type="text" name="empresa" placeholder="Ej: ACME Corp" autocomplete="off" required class="mt-2 block w-full rounded-lg border-gray-300 shadow-sm px-4 py-3 focus:border-indigo-500 focus:ring-indigo-500">
+                        <label for="empresa" class="block text-md font-semibold text-gray-700 mb-2">Empresa *</label>
+                        <input id="empresa" type="text" name="empresa" placeholder="Ej: ACME Corp" autocomplete="off" required 
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition-all">
+                        <p class="text-xs text-gray-500 mt-1">Nombre legal completo de la empresa</p>
                     </div>
                     <div>
-                        <label for="telefono" class="block text-lg font-medium text-gray-700">Teléfono</label>
-                        <input id="telefono" type="tel" name="telefono" placeholder="Ej: +507 6000-0000" required class="mt-2 block w-full rounded-lg border-gray-300 shadow-sm px-4 py-3 focus:border-indigo-500 focus:ring-indigo-500">
+                        <label for="telefono" class="block text-md font-semibold text-gray-700 mb-2">Teléfono *</label>
+                        <input id="telefono" type="tel" name="telefono" placeholder="Ej: +507 6000-0000" required 
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition-all">
                     </div>
                     <div>
-                        <label for="correo" class="block text-lg font-medium text-gray-700">Correo</label>
-                        <input id="correo" type="email" name="correo" placeholder="Ej: cliente@correo.com" required class="mt-2 block w-full rounded-lg border-gray-300 shadow-sm px-4 py-3 focus:border-indigo-500 focus:ring-indigo-500">
+                        <label for="correo" class="block text-md font-semibold text-gray-700 mb-2">Correo Electrónico *</label>
+                        <input id="correo" type="email" name="correo" placeholder="Ej: cliente@correo.com" required 
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition-all">
+                    </div>
+                    <div>
+                        <label for="identificacion" class="block text-md font-semibold text-gray-700 mb-2">Identificación Fiscal</label>
+                        <input id="identificacion" type="text" name="identificacion" placeholder="RUC, Número de Registro" 
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition-all">
+                        <p class="text-xs text-gray-500 mt-1">RUC, número de registro o identificación fiscal</p>
+                    </div>
+                    <div>
+                        <label for="contacto_alternativo" class="block text-md font-semibold text-gray-700 mb-2">Persona de Contacto Alternativa</label>
+                        <input id="contacto_alternativo" type="text" name="contacto_alternativo" placeholder="Ej: María González" 
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition-all">
                     </div>
                     <div class="col-span-2">
-                        <label for="direccion" class="block text-lg font-medium text-gray-700">Dirección</label>
-                        <input id="direccion" type="text" name="direccion" placeholder="Ej: Calle 50, Ciudad, País" required class="mt-2 block w-full rounded-lg border-gray-300 shadow-sm px-4 py-3 focus:border-indigo-500 focus:ring-indigo-500">
+                        <label for="direccion" class="block text-md font-semibold text-gray-700 mb-2">Dirección *</label>
+                        <input id="direccion" type="text" name="direccion" placeholder="Ej: Calle 50, Ciudad, País" required 
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition-all">
+                    </div>
+                </div>
+
+                <!-- Quotation Details -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="terminos_pago" class="block text-md font-semibold text-gray-700 mb-2">Términos de Pago</label>
+                        <select id="terminos_pago" name="terminos_pago" 
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition-all">
+                            <option value="">Seleccionar Términos</option>
+                            <option value="contado">Contado</option>
+                            <option value="15_dias">15 Días</option>
+                            <option value="30_dias">30 Días</option>
+                            <option value="45_dias">45 Días</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="validez_cotizacion" class="block text-md font-semibold text-gray-700 mb-2">Validez de Cotización</label>
+                        <select id="validez_cotizacion" name="validez_cotizacion" 
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition-all">
+                            <option value="15_dias">15 Días</option>
+                            <option value="30_dias">30 Días</option>
+                            <option value="45_dias">45 Días</option>
+                        </select>
                     </div>
                 </div>
 
@@ -47,8 +89,8 @@
                 <div class="mt-8">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-xl font-medium text-gray-900">Items</h3>
-                        <button type="button" id="agregar-item" class="bg-indigo-600 text-white px-5 py-3 rounded-lg hover:bg-indigo-700">
-                            <i class="fas fa-plus"></i> Agregar Item
+                        <button type="button" id="agregar-item" class="bg-indigo-600 text-white px-5 py-3 rounded-lg hover:bg-indigo-700 transition-colors">
+                            <i class="fas fa-plus mr-2"></i> Agregar Item
                         </button>
                     </div>
                     <div id="items-container" class="space-y-6">
@@ -75,29 +117,44 @@
                     </div>
                 </div>
 
-                <!-- Totals Section Floating Box -->
-                <div class="fixed bottom-5 right-10 bg-white shadow-lg p-6 rounded-lg border border-gray-200 z-50">
-                    <h3 class="text-xl font-medium text-gray-900 mb-4">Resumen</h3>
-                    <div class="flex justify-between text-lg">
-                        <span>Subtotal:</span>
-                        <span id="subtotal">$0.00</span>
-                    </div>
-                    <div class="flex justify-between text-lg">
-                        <span>ITBMS (7%):</span>
-                        <span id="itbms">$0.00</span>
-                    </div>
-                    <div class="flex justify-between font-bold text-2xl mt-2">
-                        <span>Total:</span>
-                        <span id="total">$0.00</span>
+                <!-- Totals Section -->
+                <div class="mt-8 bg-gray-50 rounded-lg p-4">
+                    <div class="grid grid-cols-12 gap-4 items-center">
+                        <div class="col-span-8 text-right pr-4">
+                            <span class="text-gray-700 font-medium">Subtotal:</span>
+                        </div>
+                        <div class="col-span-4">
+                            <input type="text" id="subtotal" name="subtotal" readonly 
+                                class="w-full text-right bg-gray-50 border-none focus:ring-0 font-semibold" 
+                                value="$0.00" />
+                        </div>
+                        
+                        <div class="col-span-8 text-right pr-4">
+                            <span class="text-gray-700 font-medium">ITBMS (7%):</span>
+                        </div>
+                        <div class="col-span-4">
+                            <input type="text" id="itbms" name="itbms" readonly 
+                                class="w-full text-right bg-gray-50 border-none focus:ring-0 font-semibold" 
+                                value="$0.00" />
+                        </div>
+                        
+                        <div class="col-span-8 text-right pr-4">
+                            <span class="text-xl font-bold text-gray-900">Total:</span>
+                        </div>
+                        <div class="col-span-4">
+                            <input type="text" id="total" name="total" readonly 
+                                class="w-full text-right bg-gray-50 border-none focus:ring-0 text-xl font-bold text-indigo-700" 
+                                value="$0.00" />
+                        </div>
                     </div>
                 </div>
 
                 <!-- Submit Buttons -->
                 <div class="mt-8 flex justify-end space-x-6">
-                    <button type="button" id="cancelar" class="bg-gray-200 text-gray-700 px-5 py-3 rounded-lg hover:bg-gray-300">
+                    <button type="button" id="cancelar" class="bg-gray-200 text-gray-700 px-5 py-3 rounded-lg hover:bg-gray-300 transition-colors">
                         Cancelar
                     </button>
-                    <button type="submit" class="bg-indigo-600 text-white px-5 py-3 rounded-lg hover:bg-indigo-700">
+                    <button type="submit" class="bg-indigo-600 text-white px-5 py-3 rounded-lg hover:bg-indigo-700 transition-colors">
                         Generar Cotización
                     </button>
                 </div>
@@ -190,16 +247,16 @@ document.addEventListener('DOMContentLoaded', function() {
             const unidades = parseInt(unidadesInput.value) || 0;
             const itemTotal = precio * unidades;
 
-            itemTotalSpan.textContent = `$${itemTotal.toFixed(2)}`;
+            itemTotalSpan.textContent = `${itemTotal.toFixed(2)}`;
             subtotal += itemTotal;
         });
 
         const itbms = subtotal * 0.07;
         const total = subtotal + itbms;
 
-        document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
-        document.getElementById('itbms').textContent = `$${itbms.toFixed(2)}`;
-        document.getElementById('total').textContent = `$${total.toFixed(2)}`;
+        document.getElementById('subtotal').textContent = `${subtotal.toFixed(2)}`;
+        document.getElementById('itbms').textContent = `${itbms.toFixed(2)}`;
+        document.getElementById('total').textContent = `${total.toFixed(2)}`;
     }
 
     // Form validation before submission
@@ -207,6 +264,38 @@ document.addEventListener('DOMContentLoaded', function() {
         const itemRows = document.querySelectorAll('.item-row');
         let isValid = true;
 
+        // Validate customer information
+        const requiredFields = [
+            'nombre', 'empresa', 'telefono', 'correo', 'direccion'
+        ];
+
+        requiredFields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (!field.value.trim()) {
+                field.classList.add('border-red-500');
+                isValid = false;
+            } else {
+                field.classList.remove('border-red-500');
+            }
+        });
+
+        // Validate email format
+        const emailField = document.getElementById('correo');
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(emailField.value)) {
+            emailField.classList.add('border-red-500');
+            isValid = false;
+        }
+
+        // Validate phone number (basic validation)
+        const telefonoField = document.getElementById('telefono');
+        const phoneRegex = /^(\+?[0-9]{7,15})$/;
+        if (!phoneRegex.test(telefonoField.value.replace(/\s+/g, ''))) {
+            telefonoField.classList.add('border-red-500');
+            isValid = false;
+        }
+
+        // Validate items
         itemRows.forEach(row => {
             const descripcion = row.querySelector('[name="descripcion[]"]');
             const precio = row.querySelector('[name="precio_unitario[]"]');
@@ -236,9 +325,125 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (!isValid) {
             e.preventDefault();
-            alert('Por favor, complete todos los campos correctamente');
+            
+            // Create and show error modal
+            const errorModal = document.createElement('div');
+            errorModal.innerHTML = `
+                <div class="fixed inset-0 bg-black bg-opacity-50 z-[100] flex justify-center items-center">
+                    <div class="bg-white p-8 rounded-xl shadow-2xl max-w-md w-full">
+                        <div class="text-center">
+                            <i class="fas fa-exclamation-triangle text-red-500 text-6xl mb-4"></i>
+                            <h2 class="text-2xl font-bold text-gray-800 mb-4">Error de Validación</h2>
+                            <p class="text-gray-600 mb-6">Por favor, complete todos los campos correctamente. Los campos con error se han resaltado en rojo.</p>
+                            <button id="close-error-modal" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors">
+                                Entendido
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(errorModal);
+
+            // Close error modal
+            errorModal.querySelector('#close-error-modal').addEventListener('click', () => {
+                errorModal.remove();
+            });
         }
     });
+
+    // Optional: Add real-time validation for individual fields
+    function addRealtimeValidation(fieldId, validationFn) {
+        const field = document.getElementById(fieldId);
+        field.addEventListener('input', function() {
+            if (validationFn(this.value)) {
+                this.classList.remove('border-red-500');
+                this.classList.add('border-green-500');
+            } else {
+                this.classList.add('border-red-500');
+                this.classList.remove('border-green-500');
+            }
+        });
+    }
+
+    // Real-time validations
+    addRealtimeValidation('correo', (value) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(value);
+    });
+
+    addRealtimeValidation('telefono', (value) => {
+        const phoneRegex = /^(\+?[0-9]{7,15})$/;
+        return phoneRegex.test(value.replace(/\s+/g, ''));
+    });
+
+    // Optional: Add a draft save functionality (placeholder)
+    function saveDraft() {
+        const formData = new FormData(document.getElementById('quotation-form'));
+        const draftData = {};
+        
+        for (let [key, value] of formData.entries()) {
+            if (!draftData[key]) {
+                draftData[key] = value;
+            } else {
+                // Handle multiple values (like items)
+                if (!Array.isArray(draftData[key])) {
+                    draftData[key] = [draftData[key]];
+                }
+                draftData[key].push(value);
+            }
+        }
+
+        localStorage.setItem('quotationDraft', JSON.stringify(draftData));
+        
+        // Show draft saved notification
+        const notification = document.createElement('div');
+        notification.innerHTML = `
+            <div class="fixed top-5 right-5 bg-green-500 text-white px-6 py-4 rounded-lg shadow-xl z-[100] transition-all">
+                Borrador guardado exitosamente
+            </div>
+        `;
+        document.body.appendChild(notification);
+
+        // Remove notification after 3 seconds
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }
+
+    // Add draft save button
+    const draftSaveBtn = document.createElement('button');
+    draftSaveBtn.innerHTML = `
+        <i class="fas fa-save mr-2"></i> Guardar Borrador
+    `;
+    draftSaveBtn.className = 'bg-gray-500 text-white px-5 py-3 rounded-lg hover:bg-gray-600 transition-colors absolute top-2 right-2';
+    draftSaveBtn.addEventListener('click', saveDraft);
+    
+    // Append draft save button next to the form
+    const formContainer = document.querySelector('.bg-white.rounded-2xl');
+    formContainer.style.position = 'relative';
+    formContainer.appendChild(draftSaveBtn);
+
+    // Optional: Load draft if exists
+    function loadDraft() {
+        const draftData = localStorage.getItem('quotationDraft');
+        if (draftData) {
+            const draft = JSON.parse(draftData);
+            
+            // Populate form fields
+            Object.keys(draft).forEach(key => {
+                const field = document.querySelector(`[name="${key}"]`);
+                if (field) {
+                    field.value = draft[key];
+                }
+            });
+
+            // Trigger totals recalculation
+            calcularTotales();
+        }
+    }
+
+    // Load draft on page load
+    loadDraft();
 });
 </script>
 {% endblock %}
