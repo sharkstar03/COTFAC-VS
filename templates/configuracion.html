@@ -1,0 +1,69 @@
+<!-- templates/configuracion.html -->
+{% extends "base.html" %}
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-2xl font-bold mb-6">Configuración del Sistema</h2>
+        
+        <form method="POST" enctype="multipart/form-data" class="space-y-6">
+            <!-- Logo -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Logo de la empresa</label>
+                <div class="mt-1 flex items-center">
+                    {% if config.logo %}
+                    <img src="{{ url_for('static', filename='uploads/' + config.logo) }}" 
+                         alt="Logo actual" 
+                         class="h-12 w-auto">
+                    {% endif %}
+                    <input type="file" name="logo" class="ml-4">
+                </div>
+            </div>
+
+            <!-- Información de la empresa -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Nombre de la empresa</label>
+                    <input type="text" name="nombre_empresa" value="{{ config.nombre_empresa }}" 
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Dirección</label>
+                    <input type="text" name="direccion" value="{{ config.direccion }}"
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                </div>
+                
+                <!-- Más campos... -->
+            </div>
+
+            <!-- Configuración del sistema -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Prefijo Cotización</label>
+                    <input type="text" name="prefijo_cotizacion" value="{{ config.prefijo_cotizacion }}"
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Prefijo Factura</label>
+                    <input type="text" name="prefijo_factura" value="{{ config.prefijo_factura }}"
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Días de validez</label>
+                    <input type="number" name="dias_validez_cotizacion" value="{{ config.dias_validez_cotizacion }}"
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                </div>
+            </div>
+
+            <div class="flex justify-end mt-6">
+                <button type="submit" 
+                        class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors">
+                    Guardar cambios
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page {
+            size: letter;
+            margin: 2.5cm;
+            @top-right {
+                content: "Página " counter(page);
+            }
+        }
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: top;
+            margin-bottom: 2cm;
+        }
+        .logo {
+            width: 200px;
+        }
+        .company-info {
+            text-align: right;
+        }
+        .document-title {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            color: #2563eb;
+        }
+        .watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 100px;
+            color: rgba(0,0,0,0.1);
+            z-index: -1;
+        }
+        .client-info {
+            margin-bottom: 20px;
+        }
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .items-table th, .items-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        .items-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        .totals {
+            margin-left: auto;
+            width: 300px;
+        }
+        .totals-table {
+            width: 100%;
+        }
+        .totals-table td {
+            padding: 5px;
+        }
+        .totals-table .total-line {
+            font-weight: bold;
+            border-top: 2px solid #333;
+        }
+        .terms {
+            margin-top: 40px;
+            font-size: 0.9em;
+            color: #666;
+        }
+        .payment-info {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        .validity {
+            color: #dc2626;
+            text-align: center;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .signatures {
+            margin-top: 60px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .signature-line {
+            width: 200px;
+            text-align: center;
+            border-top: 1px solid #333;
+            padding-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="watermark">VIANG SOLUTION</div>
+    
+    <div class="header">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" class="logo" alt="Logo">
+        <div class="company-info">
+            <h1 class="document-title">COTIZACIÓN</h1>
+            <p>Fecha: {{ cotizacion.fecha.strftime('%d/%m/%Y') }}</p>
+            <p>N° {{ cotizacion.numero }}</p>
+        </div>
+    </div>
+
+    <div class="client-info">
+        <h3>INFORMACIÓN DEL CLIENTE</h3>
+        <p><strong>Nombre:</strong> {{ cotizacion.nombre }}</p>
+        {% if cotizacion.empresa %}
+        <p><strong>Empresa:</strong> {{ cotizacion.empresa }}</p>
+        {% endif %}
+        <p><strong>Ubicación:</strong> {{ cotizacion.ubicacion }}</p>
+        <p><strong>Teléfono:</strong> {{ cotizacion.telefono }}</p>
+        {% if cotizacion.ruc %}
+        <p><strong>RUC:</strong> {{ cotizacion.ruc }} <strong>DV:</strong> {{ cotizacion.dv }}</p>
+        {% endif %}
+    </div>
+
+    <div class="validity">
+        ESTA COTIZACIÓN ES VÁLIDA POR 15 DÍAS
+    </div>
+
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th>Descripción</th>
+                <th>P/U</th>
+                <th>Unidades</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cotizacion.items %}
+            <tr>
+                <td>{{ item.descripcion }}</td>
+                <td>${{ "%.2f"|format(item.precio_unitario) }}</td>
+                <td>{{ item.unidades }}</td>
+                <td>${{ "%.2f"|format(item.total) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="totals">
+        <table class="totals-table">
+            <tr>
+                <td>Subtotal:</td>
+                <td>${{ "%.2f"|format(cotizacion.subtotal) }}</td>
+            </tr>
+            {% if cotizacion.itbms %}
+            <tr>
+                <td>ITBMS (7%):</td>
+                <td>${{ "%.2f"|format(cotizacion.itbms) }}</td>
+            </tr>
+            {% endif %}
+            <tr class="total-line">
+                <td>Total:</td>
+                <td>${{ "%.2f"|format(cotizacion.total) }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="payment-info">
+        <h3>MÉTODOS DE PAGO</h3>
+        <p><strong>BANCO GENERAL</strong></p>
+        <p>Cuenta N°: 04-72-98-21-23-33-0</p>
+        <p>Tipo de Cuenta: AHORRO</p>
+        <p>Nombre: Vionel Angulo</p>
+    </div>
+
+    <div class="terms">
+        <h3>Términos y Condiciones</h3>
+        <ul>
+            <li>El 50% del monto total debe abonarse al aprobar esta cotización.</li>
+            <li>El saldo restante debe ser pagado al momento de la entrega del producto o finalización del servicio.</li>
+            <li>No se aceptan devoluciones ni reembolsos una vez aprobado el servicio.</li>
+            <li>Cualquier cambio en los requerimientos después de aprobada la cotización podrá generar un costo adicional.</li>
+        </ul>
+    </div>
+
+    <div class="signatures">
+        <div class="signature-line">
+            <p>{{ cotizacion.nombre }}</p>
+            <p>Cliente</p>
+        </div>
+        <div class="signature-line">
+            <p>Vionel Angulo</p>
+            <p>VIANG SOLUTION</p>
+        </div>
+    </div>
+</body>
+</html>
