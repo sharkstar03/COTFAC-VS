@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- Sidebar -->
+<div class="w-72 bg-white shadow-lg border-r border-gray-100">
+    {% include 'components/sidebar.html' %}
+</div>
+
+<div class="container mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold">Facturas</h1>
+            <div class="flex space-x-4">
+                <a href="{{ url_for('formulario_natural') }}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    Nueva Factura Personal
+                </a>
+                <a href="{{ url_for('formulario_empresa') }}" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                    Nueva Factura Empresa
+                </a>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="mb-6">
+            <form method="GET" class="flex space-x-4">
+                <input type="text" name="buscar" placeholder="Buscar por cliente..." 
+                       class="border rounded px-4 py-2 w-full">
+                <button type="submit" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                    Buscar
+                </button>
+            </form>
+        </div>
+
+        <!-- Tabla de Facturas -->
+        <div class="overflow-x-auto">
+            <table class="min-w-full table-auto">
+                <thead>
+                    <tr class="bg-gray-100">
+                        <th class="px-4 py-2 text-left">N° Factura</th>
+                        <th class="px-4 py-2 text-left">Cliente</th>
+                        <th class="px-4 py-2 text-left">Fecha</th>
+                        <th class="px-4 py-2 text-left">Total</th>
+                        <th class="px-4 py-2 text-left">Estado</th>
+                        <th class="px-4 py-2 text-left">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for factura in facturas %}
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="px-4 py-2">{{ factura.numero }}</td>
+                        <td class="px-4 py-2">{{ factura.nombre }}</td>
+                        <td class="px-4 py-2">{{ factura.fecha.strftime('%d/%m/%Y') }}</td>
+                        <td class="px-4 py-2">${{ "%.2f"|format(factura.total) }}</td>
+                        <td class="px-4 py-2">
+                            <span class="px-2 py-1 rounded text-sm
+                                {% if factura.estado == 'pagada' %}
+                                    bg-green-100 text-green-800
+                                {% elif factura.estado == 'pendiente' %}
+                                    bg-yellow-100 text-yellow-800
+                                {% else %}
+                                    bg-red-100 text-red-800
+                                {% endif %}">
+                                {{ factura.estado|title }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-2">
+                            <div class="flex space-x-2">
+                                <a href="{{ url_for('ver_factura', numero=factura.numero) }}" 
+                                   class="text-blue-500 hover:text-blue-700">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                {% if factura.estado != 'pagada' %}
+                                <button onclick="marcarPagada('{{ factura.numero }}')"
+                                        class="text-green-500 hover:text-green-700">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                {% endif %}
+                                <button onclick="eliminarFactura('{{ factura.numero }}')"
+                                        class="text-red-500 hover:text-red-700">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmación -->
+<div id="modal-eliminar" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white p-6 rounded-lg">
+        <h3 class="text-lg font-bold mb-4">¿Estás seguro de eliminar esta factura?</h3>
+        <p class="mb-4">Esta acción no se puede deshacer.</p>
+        <div class="flex justify-end space-x-4">
+            <button onclick="cerrarModal()" 
+                    class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
+                Cancelar
+            </button>
+            <button id="confirmar-eliminar" 
+                    class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+                Eliminar
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let facturaNumeroAEliminar = null;
+
+function eliminarFactura(numero) {
+    facturaNumeroAEliminar = numero;
+    document.getElementById('modal-eliminar').classList.remove('hidden');
+}
+
+function cerrarModal() {
+    document.getElementById('modal-eliminar').classList.add('hidden');
+    facturaNumeroAEliminar = null;
+}
+
+async function marcarPagada(numero) {
+    try {
+        const response = await fetch(`/marcar_pagada/${numero}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            location.reload();
+        } else {
+            alert('Error al marcar la factura como pagada');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al marcar la factura como pagada');
+    }
+}
+
+document.getElementById('confirmar-eliminar').addEventListener('click', async () => {
+    if (facturaNumeroAEliminar) {
+        try {
+            const response = await fetch(`/eliminar_factura/${facturaNumeroAEliminar}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Error al eliminar la factura');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al eliminar la factura');
+        }
+        cerrarModal();
+    }
+});
+</script>
+{% endblock %}

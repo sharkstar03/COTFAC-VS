@@ -12,14 +12,14 @@
     <div class="flex-1 p-6 md:p-10 relative overflow-auto">
         <div class="mb-6 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <h1 class="text-2xl md:text-3xl font-bold text-indigo-800">Nueva Cotización Empresarial</h1>
-            <a href="{{ url_for('select_type') }}" class="bg-indigo-50 text-indigo-700 px-4 py-2 rounded-lg hover:bg-indigo-100 transition-colors flex items-center">
+            <a href="{{ url_for('dashboard') }}" class="bg-indigo-50 text-indigo-700 px-4 py-2 rounded-lg hover:bg-indigo-100 transition-colors flex items-center">
                 <i class="fas fa-arrow-left mr-2"></i> Volver
             </a>
         </div>
 
         <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-gray-100">
             <form id="quotation-form" action="{{ url_for('generate_pdf_empresa') }}" method="POST" class="space-y-8">
-                <!-- Información del cliente -->
+                <!-- Client Information -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label for="nombre" class="block text-md font-semibold text-gray-700 mb-2">Nombre del Cliente *</label>
@@ -47,7 +47,6 @@
                         <label for="identificacion" class="block text-md font-semibold text-gray-700 mb-2">Identificación Fiscal</label>
                         <input id="identificacion" type="text" name="identificacion" placeholder="RUC, Número de Registro" 
                             class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition-all">
-                        <p class="text-xs text-gray-500 mt-1">RUC, número de registro o identificación fiscal</p>
                     </div>
                     <div>
                         <label for="contacto_alternativo" class="block text-md font-semibold text-gray-700 mb-2">Persona de Contacto Alternativa</label>
@@ -61,7 +60,7 @@
                     </div>
                 </div>
 
-                <!-- Quotation Details -->
+                <!-- Payment Terms -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label for="terminos_pago" class="block text-md font-semibold text-gray-700 mb-2">Términos de Pago</label>
@@ -117,6 +116,12 @@
                     </div>
                 </div>
 
+                <!-- ITBMS Toggle -->
+                <div class="flex items-center space-x-2 p-4 bg-gray-50 rounded-lg">
+                    <input type="checkbox" id="include-itbms" name="include_itbms" class="w-4 h-4 text-indigo-600" checked>
+                    <label for="include-itbms" class="text-sm font-medium text-gray-700">Incluir ITBMS (7%)</label>
+                </div>
+
                 <!-- Totals Section -->
                 <div class="mt-8 bg-gray-50 rounded-lg p-4">
                     <div class="grid grid-cols-12 gap-4 items-center">
@@ -126,16 +131,16 @@
                         <div class="col-span-4">
                             <input type="text" id="subtotal" name="subtotal" readonly 
                                 class="w-full text-right bg-gray-50 border-none focus:ring-0 font-semibold" 
-                                value="$0.00" />
+                                value="$0.00">
                         </div>
                         
-                        <div class="col-span-8 text-right pr-4">
+                        <div class="col-span-8 text-right pr-4 itbms-row">
                             <span class="text-gray-700 font-medium">ITBMS (7%):</span>
                         </div>
-                        <div class="col-span-4">
+                        <div class="col-span-4 itbms-row">
                             <input type="text" id="itbms" name="itbms" readonly 
                                 class="w-full text-right bg-gray-50 border-none focus:ring-0 font-semibold" 
-                                value="$0.00" />
+                                value="$0.00">
                         </div>
                         
                         <div class="col-span-8 text-right pr-4">
@@ -144,7 +149,7 @@
                         <div class="col-span-4">
                             <input type="text" id="total" name="total" readonly 
                                 class="w-full text-right bg-gray-50 border-none focus:ring-0 text-xl font-bold text-indigo-700" 
-                                value="$0.00" />
+                                value="$0.00">
                         </div>
                     </div>
                 </div>
@@ -167,283 +172,240 @@
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const itemsContainer = document.getElementById('items-container');
-    const agregarItemBtn = document.getElementById('agregar-item');
-    const cancelarBtn = document.getElementById('cancelar');
+   const itemsContainer = document.getElementById('items-container');
+   const agregarItemBtn = document.getElementById('agregar-item');
+   const cancelarBtn = document.getElementById('cancelar');
+   const includeITBMSToggle = document.getElementById('include-itbms');
+   const itbmsRows = document.querySelectorAll('.itbms-row');
 
-    // Cancelar button returns to select type page
-    cancelarBtn.addEventListener('click', function() {
-        window.location.href = '{{ url_for("select_type") }}';
-    });
+   // ITBMS visibility toggle
+   function updateITBMSVisibility() {
+       itbmsRows.forEach(row => {
+           row.style.display = includeITBMSToggle.checked ? '' : 'none';
+       });
+       calcularTotales();
+   }
 
-    // Add new item row
-    agregarItemBtn.addEventListener('click', function() {
-        const newItemRow = document.createElement('div');
-        newItemRow.className = 'grid grid-cols-12 gap-6 items-center bg-white p-4 rounded-lg shadow-md item-row';
-        newItemRow.innerHTML = `
-            <div class="col-span-5">
-                <input type="text" name="descripcion[]" placeholder="Descripción" required class="block w-full rounded-lg border-gray-300 shadow-sm px-4 py-3 focus:border-indigo-500 focus:ring-indigo-500">
-            </div>
-            <div class="col-span-2">
-                <input type="number" name="precio_unitario[]" placeholder="Precio" min="0" step="0.01" required class="block w-full rounded-lg border-gray-300 shadow-sm px-4 py-3 focus:border-indigo-500 focus:ring-indigo-500">
-            </div>
-            <div class="col-span-2">
-                <input type="number" name="unidades[]" placeholder="Cantidad" min="1" required class="block w-full rounded-lg border-gray-300 shadow-sm px-4 py-3 focus:border-indigo-500 focus:ring-indigo-500">
-            </div>
-            <div class="col-span-2 text-right">
-                <span class="item-total font-semibold">$0.00</span>
-            </div>
-            <div class="col-span-1">
-                <button type="button" class="remove-item text-red-600 hover:text-red-800">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
-        `;
-        itemsContainer.appendChild(newItemRow);
-        
-        // Add event listeners to new row
-        newItemRow.querySelector('[name="precio_unitario[]"]').addEventListener('input', calcularTotales);
-        newItemRow.querySelector('[name="unidades[]"]').addEventListener('input', calcularTotales);
-        newItemRow.querySelector('.remove-item').addEventListener('click', function() {
-            newItemRow.remove();
-            calcularTotales();
-        });
-    });
+   includeITBMSToggle.addEventListener('change', updateITBMSVisibility);
+   updateITBMSVisibility();
 
-    // Remove existing items
-    itemsContainer.addEventListener('click', function(e) {
-        if (e.target.closest('.remove-item')) {
-            const itemRow = e.target.closest('.item-row');
-            if (itemsContainer.querySelectorAll('.item-row').length > 1) {
-                itemRow.remove();
-                calcularTotales();
-            } else {
-                alert('Debe haber al menos un item en la cotización');
-            }
-        }
-    });
+   // Cancelar button
+   cancelarBtn.addEventListener('click', function() {
+       window.location.href = '{{ url_for("select_type") }}';
+   });
 
-    // Calculate totals when inputs change
-    itemsContainer.addEventListener('input', function(e) {
-        if (e.target.name === 'precio_unitario[]' || e.target.name === 'unidades[]') {
-            calcularTotales();
-        }
-    });
+   // Add new item row
+   agregarItemBtn.addEventListener('click', function() {
+       const newItemRow = document.createElement('div');
+       newItemRow.className = 'grid grid-cols-12 gap-6 items-center bg-white p-4 rounded-lg shadow-md item-row';
+       newItemRow.innerHTML = `
+           <div class="col-span-5">
+               <input type="text" name="descripcion[]" placeholder="Descripción" required class="block w-full rounded-lg border-gray-300 shadow-sm px-4 py-3 focus:border-indigo-500 focus:ring-indigo-500">
+           </div>
+           <div class="col-span-2">
+               <input type="number" name="precio_unitario[]" placeholder="Precio" min="0" step="0.01" required class="block w-full rounded-lg border-gray-300 shadow-sm px-4 py-3 focus:border-indigo-500 focus:ring-indigo-500">
+           </div>
+           <div class="col-span-2">
+               <input type="number" name="unidades[]" placeholder="Cantidad" min="1" required class="block w-full rounded-lg border-gray-300 shadow-sm px-4 py-3 focus:border-indigo-500 focus:ring-indigo-500">
+           </div>
+           <div class="col-span-2 text-right">
+               <span class="item-total font-semibold">$0.00</span>
+           </div>
+           <div class="col-span-1">
+               <button type="button" class="remove-item text-red-600 hover:text-red-800">
+                   <i class="fas fa-trash"></i>
+               </button>
+           </div>
+       `;
+       itemsContainer.appendChild(newItemRow);
+       
+       // Add event listeners to new row
+       newItemRow.querySelector('[name="precio_unitario[]"]').addEventListener('input', calcularTotales);
+       newItemRow.querySelector('[name="unidades[]"]').addEventListener('input', calcularTotales);
+       newItemRow.querySelector('.remove-item').addEventListener('click', function() {
+           if (itemsContainer.querySelectorAll('.item-row').length > 1) {
+               newItemRow.remove();
+               calcularTotales();
+           } else {
+               alert('Debe haber al menos un item en la cotización');
+           }
+       });
+   });
 
-    // Initial calculation
-    calcularTotales();
+   // Calculate totals
+   function calcularTotales() {
+       let subtotal = 0;
+       const itemRows = document.querySelectorAll('.item-row');
 
-    // Totals calculation function
-    function calcularTotales() {
-        let subtotal = 0;
-        const itemRows = document.querySelectorAll('.item-row');
+       itemRows.forEach(row => {
+           const precioInput = row.querySelector('[name="precio_unitario[]"]');
+           const unidadesInput = row.querySelector('[name="unidades[]"]');
+           const itemTotalSpan = row.querySelector('.item-total');
 
-        itemRows.forEach(row => {
-            const precioInput = row.querySelector('[name="precio_unitario[]"]');
-            const unidadesInput = row.querySelector('[name="unidades[]"]');
-            const itemTotalSpan = row.querySelector('.item-total');
+           const precio = parseFloat(precioInput.value) || 0;
+           const unidades = parseInt(unidadesInput.value) || 0;
+           const itemTotal = precio * unidades;
 
-            const precio = parseFloat(precioInput.value) || 0;
-            const unidades = parseInt(unidadesInput.value) || 0;
-            const itemTotal = precio * unidades;
+           itemTotalSpan.textContent = `$${itemTotal.toFixed(2)}`;
+           subtotal += itemTotal;
+       });
 
-            itemTotalSpan.textContent = `${itemTotal.toFixed(2)}`;
-            subtotal += itemTotal;
-        });
+       const itbms = includeITBMSToggle.checked ? subtotal * 0.07 : 0;
+       const total = subtotal + itbms;
 
-        const itbms = subtotal * 0.07;
-        const total = subtotal + itbms;
+       document.getElementById('subtotal').value = `$${subtotal.toFixed(2)}`;
+       document.getElementById('itbms').value = `$${itbms.toFixed(2)}`;
+       document.getElementById('total').value = `$${total.toFixed(2)}`;
+   }
 
-        document.getElementById('subtotal').textContent = `${subtotal.toFixed(2)}`;
-        document.getElementById('itbms').textContent = `${itbms.toFixed(2)}`;
-        document.getElementById('total').textContent = `${total.toFixed(2)}`;
-    }
+   // Add event listeners for existing inputs
+   document.querySelectorAll('[name="precio_unitario[]"], [name="unidades[]"]').forEach(input => {
+       input.addEventListener('input', calcularTotales);
+   });
 
-    // Form validation before submission
-    document.getElementById('quotation-form').addEventListener('submit', function(e) {
-        const itemRows = document.querySelectorAll('.item-row');
-        let isValid = true;
+   // Event listener for ITBMS toggle
+   includeITBMSToggle.addEventListener('change', () => {
+       updateITBMSVisibility();
+       calcularTotales();
+   });
 
-        // Validate customer information
-        const requiredFields = [
-            'nombre', 'empresa', 'telefono', 'correo', 'direccion'
-        ];
+   // Form validation
+   document.getElementById('quotation-form').addEventListener('submit', function(e) {
+       let isValid = true;
+       const requiredFields = ['nombre', 'empresa', 'telefono', 'correo', 'direccion'];
 
-        requiredFields.forEach(fieldId => {
-            const field = document.getElementById(fieldId);
-            if (!field.value.trim()) {
-                field.classList.add('border-red-500');
-                isValid = false;
-            } else {
-                field.classList.remove('border-red-500');
-            }
-        });
+       requiredFields.forEach(fieldId => {
+           const field = document.getElementById(fieldId);
+           if (!field.value.trim()) {
+               field.classList.add('border-red-500');
+               isValid = false;
+           } else {
+               field.classList.remove('border-red-500');
+           }
+       });
 
-        // Validate email format
-        const emailField = document.getElementById('correo');
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(emailField.value)) {
-            emailField.classList.add('border-red-500');
-            isValid = false;
-        }
+       const emailField = document.getElementById('correo');
+       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+       if (!emailRegex.test(emailField.value)) {
+           emailField.classList.add('border-red-500');
+           isValid = false;
+       }
 
-        // Validate phone number (basic validation)
-        const telefonoField = document.getElementById('telefono');
-        const phoneRegex = /^(\+?[0-9]{7,15})$/;
-        if (!phoneRegex.test(telefonoField.value.replace(/\s+/g, ''))) {
-            telefonoField.classList.add('border-red-500');
-            isValid = false;
-        }
+       const telefonoField = document.getElementById('telefono');
+       const phoneRegex = /^(\+?[0-9]{7,15})$/;
+       if (!phoneRegex.test(telefonoField.value.replace(/\s+/g, ''))) {
+           telefonoField.classList.add('border-red-500');
+           isValid = false;
+       }
 
-        // Validate items
-        itemRows.forEach(row => {
-            const descripcion = row.querySelector('[name="descripcion[]"]');
-            const precio = row.querySelector('[name="precio_unitario[]"]');
-            const unidades = row.querySelector('[name="unidades[]"]');
+       // Validate items
+       const itemRows = document.querySelectorAll('.item-row');
+       itemRows.forEach(row => {
+           const descripcion = row.querySelector('[name="descripcion[]"]');
+           const precio = row.querySelector('[name="precio_unitario[]"]');
+           const unidades = row.querySelector('[name="unidades[]"]');
 
-            if (!descripcion.value.trim()) {
-                descripcion.classList.add('border-red-500');
-                isValid = false;
-            } else {
-                descripcion.classList.remove('border-red-500');
-            }
+           if (!descripcion.value.trim()) {
+               descripcion.classList.add('border-red-500');
+               isValid = false;
+           }
 
-            if (precio.value <= 0) {
-                precio.classList.add('border-red-500');
-                isValid = false;
-            } else {
-                precio.classList.remove('border-red-500');
-            }
+           if (precio.value <= 0) {
+               precio.classList.add('border-red-500');
+               isValid = false;
+           }
 
-            if (unidades.value <= 0) {
-                unidades.classList.add('border-red-500');
-                isValid = false;
-            } else {
-                unidades.classList.remove('border-red-500');
-            }
-        });
+           if (unidades.value <= 0) {
+               unidades.classList.add('border-red-500');
+               isValid = false;
+           }
+       });
 
-        if (!isValid) {
-            e.preventDefault();
-            
-            // Create and show error modal
-            const errorModal = document.createElement('div');
-            errorModal.innerHTML = `
-                <div class="fixed inset-0 bg-black bg-opacity-50 z-[100] flex justify-center items-center">
-                    <div class="bg-white p-8 rounded-xl shadow-2xl max-w-md w-full">
-                        <div class="text-center">
-                            <i class="fas fa-exclamation-triangle text-red-500 text-6xl mb-4"></i>
-                            <h2 class="text-2xl font-bold text-gray-800 mb-4">Error de Validación</h2>
-                            <p class="text-gray-600 mb-6">Por favor, complete todos los campos correctamente. Los campos con error se han resaltado en rojo.</p>
-                            <button id="close-error-modal" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors">
-                                Entendido
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(errorModal);
+       if (!isValid) {
+           e.preventDefault();
+           showErrorModal();
+       }
+   });
 
-            // Close error modal
-            errorModal.querySelector('#close-error-modal').addEventListener('click', () => {
-                errorModal.remove();
-            });
-        }
-    });
+   function showErrorModal() {
+       const modal = document.createElement('div');
+       modal.innerHTML = `
+           <div class="fixed inset-0 bg-black bg-opacity-50 z-[100] flex justify-center items-center">
+               <div class="bg-white p-8 rounded-xl shadow-2xl max-w-md w-full">
+                   <div class="text-center">
+                       <i class="fas fa-exclamation-triangle text-red-500 text-6xl mb-4"></i>
+                       <h2 class="text-2xl font-bold text-gray-800 mb-4">Error de Validación</h2>
+                       <p class="text-gray-600 mb-6">Por favor, complete todos los campos requeridos correctamente.</p>
+                       <button id="close-error-modal" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors">
+                           Entendido
+                       </button>
+                   </div>
+               </div>
+           </div>
+       `;
+       document.body.appendChild(modal);
+       modal.querySelector('#close-error-modal').onclick = () => modal.remove();
+   }
 
-    // Optional: Add real-time validation for individual fields
-    function addRealtimeValidation(fieldId, validationFn) {
-        const field = document.getElementById(fieldId);
-        field.addEventListener('input', function() {
-            if (validationFn(this.value)) {
-                this.classList.remove('border-red-500');
-                this.classList.add('border-green-500');
-            } else {
-                this.classList.add('border-red-500');
-                this.classList.remove('border-green-500');
-            }
-        });
-    }
+   function addRealtimeValidation(fieldId, validationFn) {
+       const field = document.getElementById(fieldId);
+       if (field) {
+           field.addEventListener('input', function() {
+               if (validationFn(this.value)) {
+                   this.classList.remove('border-red-500');
+                   this.classList.add('border-green-500');
+               } else {
+                   this.classList.add('border-red-500');
+                   this.classList.remove('border-green-500');
+               }
+           });
+       }
+   }
 
-    // Real-time validations
-    addRealtimeValidation('correo', (value) => {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(value);
-    });
+   // Add validation listeners
+   addRealtimeValidation('correo', value => {
+       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+       return emailRegex.test(value);
+   });
 
-    addRealtimeValidation('telefono', (value) => {
-        const phoneRegex = /^(\+?[0-9]{7,15})$/;
-        return phoneRegex.test(value.replace(/\s+/g, ''));
-    });
+   addRealtimeValidation('telefono', value => {
+       const phoneRegex = /^(\+?[0-9]{7,15})$/;
+       return phoneRegex.test(value.replace(/\s+/g, ''));
+   });
 
-    // Optional: Add a draft save functionality (placeholder)
-    function saveDraft() {
-        const formData = new FormData(document.getElementById('quotation-form'));
-        const draftData = {};
-        
-        for (let [key, value] of formData.entries()) {
-            if (!draftData[key]) {
-                draftData[key] = value;
-            } else {
-                // Handle multiple values (like items)
-                if (!Array.isArray(draftData[key])) {
-                    draftData[key] = [draftData[key]];
-                }
-                draftData[key].push(value);
-            }
-        }
+   function saveDraft() {
+       const formData = new FormData(document.getElementById('quotation-form'));
+       const draftData = {
+           includeITBMS: includeITBMSToggle.checked
+       };
+       
+       for (let [key, value] of formData.entries()) {
+           if (Array.isArray(draftData[key])) {
+               draftData[key].push(value);
+           } else if (draftData[key]) {
+               draftData[key] = [draftData[key], value];
+           } else {
+               draftData[key] = value;
+           }
+       }
 
-        localStorage.setItem('quotationDraft', JSON.stringify(draftData));
-        
-        // Show draft saved notification
-        const notification = document.createElement('div');
-        notification.innerHTML = `
-            <div class="fixed top-5 right-5 bg-green-500 text-white px-6 py-4 rounded-lg shadow-xl z-[100] transition-all">
-                Borrador guardado exitosamente
-            </div>
-        `;
-        document.body.appendChild(notification);
+       localStorage.setItem('quotationDraft', JSON.stringify(draftData));
+       showNotification('Borrador guardado exitosamente');
+   }
 
-        // Remove notification after 3 seconds
-        setTimeout(() => {
-            notification.remove();
-        }, 3000);
-    }
+   function showNotification(message) {
+       const notification = document.createElement('div');
+       notification.innerHTML = `
+           <div class="fixed top-5 right-5 bg-green-500 text-white px-6 py-4 rounded-lg shadow-xl z-[100] transition-all">
+               ${message}
+           </div>
+       `;
+       document.body.appendChild(notification);
+       setTimeout(() => notification.remove(), 3000);
+   }
 
-    // Add draft save button
-    const draftSaveBtn = document.createElement('button');
-    draftSaveBtn.innerHTML = `
-        <i class="fas fa-save mr-2"></i> Guardar Borrador
-    `;
-    draftSaveBtn.className = 'bg-gray-500 text-white px-5 py-3 rounded-lg hover:bg-gray-600 transition-colors absolute top-2 right-2';
-    draftSaveBtn.addEventListener('click', saveDraft);
-    
-    // Append draft save button next to the form
-    const formContainer = document.querySelector('.bg-white.rounded-2xl');
-    formContainer.style.position = 'relative';
-    formContainer.appendChild(draftSaveBtn);
-
-    // Optional: Load draft if exists
-    function loadDraft() {
-        const draftData = localStorage.getItem('quotationDraft');
-        if (draftData) {
-            const draft = JSON.parse(draftData);
-            
-            // Populate form fields
-            Object.keys(draft).forEach(key => {
-                const field = document.querySelector(`[name="${key}"]`);
-                if (field) {
-                    field.value = draft[key];
-                }
-            });
-
-            // Trigger totals recalculation
-            calcularTotales();
-        }
-    }
-
-    // Load draft on page load
-    loadDraft();
+   // Initialize calculations
+   calcularTotales();
 });
 </script>
 {% endblock %}

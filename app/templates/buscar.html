@@ -2,65 +2,78 @@
 {% block title %}Buscar Cotizaciones{% endblock %}
 
 {% block content %}
-<div class="ml-64 p-8">
-    <h1 class="text-2xl font-bold text-gray-900 mb-6">Buscar Cotizaciones</h1>
 
-    <!-- Búsqueda -->
-    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-        <div class="mb-4">
-            <div class="relative">
-                <input type="text" id="searchInput" placeholder="Buscar por nombre, número de cotización o empresa..." 
-                      class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i class="fas fa-search text-gray-400"></i>
+
+<div class="ml-64 min-h-screen bg-gray-50">
+    <div class="p-8">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Buscar Cotizaciones</h1>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="w-72 bg-white shadow-lg border-r border-gray-100">
+            {% include 'components/sidebar.html' %}
+        </div>
+
+        <!-- Search Panel -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+            <div class="mb-6">
+                <div class="relative">
+                    <input type="text" id="searchInput" 
+                           placeholder="Buscar por nombre, número de cotización o empresa..." 
+                           class="w-full pl-12 pr-4 py-3.5 text-gray-700 border border-gray-300 rounded-lg shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-gray-400 text-lg"></i>
+                    </div>
                 </div>
+            </div>
+
+            <div class="flex flex-wrap gap-4">
+                <label class="group">
+                    <input type="radio" name="tipo" value="todos" checked class="hidden peer">
+                    <span class="flex items-center px-5 py-2.5 rounded-lg cursor-pointer transition-all
+                               bg-gray-100 text-gray-700 group-hover:bg-gray-200
+                               peer-checked:bg-indigo-600 peer-checked:text-white">
+                        <i class="fas fa-list mr-2"></i>Todos
+                    </span>
+                </label>
+                <label class="group">
+                    <input type="radio" name="tipo" value="empresa" class="hidden peer">
+                    <span class="flex items-center px-5 py-2.5 rounded-lg cursor-pointer transition-all
+                               bg-gray-100 text-gray-700 group-hover:bg-gray-200
+                               peer-checked:bg-indigo-600 peer-checked:text-white">
+                        <i class="fas fa-building mr-2"></i>Empresarial
+                    </span>
+                </label>
+                <label class="group">
+                    <input type="radio" name="tipo" value="natural" class="hidden peer">
+                    <span class="flex items-center px-5 py-2.5 rounded-lg cursor-pointer transition-all
+                               bg-gray-100 text-gray-700 group-hover:bg-gray-200
+                               peer-checked:bg-indigo-600 peer-checked:text-white">
+                        <i class="fas fa-user mr-2"></i>Personal
+                    </span>
+                </label>
             </div>
         </div>
 
-        <div class="flex flex-wrap gap-4">
-            <label class="flex items-center">
-                <input type="radio" name="tipo" value="todos" checked class="hidden">
-                <span class="px-4 py-2 rounded-md cursor-pointer transition-colors duration-200 
-                          checked:bg-indigo-600 checked:text-white bg-gray-100 hover:bg-gray-200">
-                    <i class="fas fa-list mr-2"></i>Todos
-                </span>
-            </label>
-            <label class="flex items-center">
-                <input type="radio" name="tipo" value="empresa" class="hidden">
-                <span class="px-4 py-2 rounded-md cursor-pointer transition-colors duration-200 
-                          checked:bg-indigo-600 checked:text-white bg-gray-100 hover:bg-gray-200">
-                    <i class="fas fa-building mr-2"></i>Empresarial
-                </span>
-            </label>
-            <label class="flex items-center">
-                <input type="radio" name="tipo" value="natural" class="hidden">
-                <span class="px-4 py-2 rounded-md cursor-pointer transition-colors duration-200 
-                          checked:bg-indigo-600 checked:text-white bg-gray-100 hover:bg-gray-200">
-                    <i class="fas fa-user mr-2"></i>Personal
-                </span>
-            </label>
-        </div>
-    </div>
-
-    <!-- Resultados -->
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="w-full">
-                <thead>
-                    <tr class="bg-gray-50">
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">N° Cotización</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="resultados">
-                    <!-- Los resultados se cargarán aquí dinámicamente -->
-                </tbody>
-            </table>
+        <!-- Results Table -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-gray-50 border-b border-gray-200">
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">N° Cotización</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Fecha</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Cliente</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Tipo</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Total</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Estado</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultados" class="divide-y divide-gray-200"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
@@ -72,13 +85,12 @@ function realizarBusqueda(query = '') {
     const tipo = document.querySelector('input[name="tipo"]:checked').value;
     const tbody = document.getElementById('resultados');
     
-    // Mostrar loading 
     tbody.innerHTML = `
         <tr>
-            <td colspan="7" class="px-6 py-4 text-center">
-                <div class="flex justify-center items-center">
-                    <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-500"></div>
-                    <span class="ml-2">Cargando...</span>
+            <td colspan="7" class="px-6 py-8 text-center">
+                <div class="flex justify-center items-center space-x-3">
+                    <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
+                    <span class="text-gray-500">Cargando resultados...</span>
                 </div>
             </td>
         </tr>
@@ -92,8 +104,11 @@ function realizarBusqueda(query = '') {
             if (data.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="7" class="px-6 py-4 text-center text-gray-500">
-                            No se encontraron resultados  
+                        <td colspan="7" class="px-6 py-8 text-center">
+                            <div class="text-gray-500">
+                                <i class="fas fa-search mb-3 text-2xl"></i>
+                                <p>No se encontraron resultados</p>
+                            </div>
                         </td>
                     </tr>
                 `;
@@ -102,43 +117,53 @@ function realizarBusqueda(query = '') {
 
             data.forEach(cotizacion => {
                 const row = document.createElement('tr');
-                row.className = 'hover:bg-gray-50';  
+                row.className = 'hover:bg-gray-50 transition-colors';  
                 row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap">${cotizacion.numero}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">${cotizacion.fecha}</td>
-                    <td class="px-6 py-4">${cotizacion.nombre}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">${cotizacion.numero}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${cotizacion.fecha}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900">${cotizacion.nombre}</td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
                                   ${cotizacion.tipo === 'empresa' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}">
                             ${cotizacion.tipo === 'empresa' ? 'Empresarial' : 'Personal'}        
                         </span>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">${cotizacion.total}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">${cotizacion.total}</td>
                     <td class="px-6 py-4 whitespace-nowrap">   
-                        <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
+                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
                                   ${cotizacion.estado === 'pendiente' ? 'bg-yellow-100 text-yellow-800' : 
                                     cotizacion.estado === 'aprobada' ? 'bg-green-100 text-green-800' :
                                     'bg-red-100 text-red-800'}">
                             ${cotizacion.estado}
                         </span>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div class="flex space-x-2">
-                            <a href="/ver/${cotizacion.numero}" class="text-indigo-600 hover:text-indigo-900">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center space-x-4">
+                            <a href="/ver/${cotizacion.numero}" 
+                               class="text-indigo-600 hover:text-indigo-900 transition-colors" 
+                               title="Ver detalles">
                                 <i class="fas fa-eye"></i>
                             </a>
-                            <a href="/reimprimir/${cotizacion.numero}" class="text-green-600 hover:text-green-900">
+                            <a href="/reimprimir/${cotizacion.numero}" 
+                               class="text-green-600 hover:text-green-900 transition-colors"
+                               title="Reimprimir">
                                 <i class="fas fa-print"></i>
                             </a>
                             ${cotizacion.estado === 'pendiente' ? `
-                                <button onclick="aprobarCotizacion('${cotizacion.numero}')" class="text-green-600 hover:text-green-900">
+                                <button onclick="aprobarCotizacion('${cotizacion.numero}')" 
+                                        class="text-green-600 hover:text-green-900 transition-colors"
+                                        title="Aprobar">
                                     <i class="fas fa-check"></i>
                                 </button>  
-                                <button onclick="rechazarCotizacion('${cotizacion.numero}')" class="text-red-600 hover:text-red-900">
+                                <button onclick="rechazarCotizacion('${cotizacion.numero}')" 
+                                        class="text-red-600 hover:text-red-900 transition-colors"
+                                        title="Rechazar">
                                     <i class="fas fa-times"></i>  
                                 </button>
                             ` : ''}
-                            <button onclick="eliminarCotizacion('${cotizacion.numero}')" class="text-red-600 hover:text-red-900">
+                            <button onclick="eliminarCotizacion('${cotizacion.numero}')" 
+                                    class="text-red-600 hover:text-red-900 transition-colors"
+                                    title="Eliminar">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -151,23 +176,29 @@ function realizarBusqueda(query = '') {
             console.error('Error:', error);
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="7" class="px-6 py-4 text-center text-red-500">  
-                        Error al cargar los resultados
+                    <td colspan="7" class="px-6 py-8 text-center">
+                        <div class="text-red-500">
+                            <i class="fas fa-exclamation-circle mb-3 text-2xl"></i>
+                            <p>Error al cargar los resultados</p>
+                        </div>
                     </td>
                 </tr>  
             `;  
         });
 }
 
-// Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('searchInput');
     const radioButtons = document.querySelectorAll('input[name="tipo"]');
 
     realizarBusqueda();
 
+    let searchTimeout;
     searchInput.addEventListener('input', (e) => {
-        realizarBusqueda(e.target.value);      
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            realizarBusqueda(e.target.value);
+        }, 300);
     });
 
     radioButtons.forEach(radio => {
@@ -181,59 +212,83 @@ function aprobarCotizacion(numero) {
     if (!confirm('¿Estás seguro de aprobar esta cotización?')) return;
 
     fetch(`/aprobar_cotizacion/${numero}`, {
-        method: 'POST',  
+        method: 'POST',
         headers: {
-            'Content-Type': 'application/json',    
+            'Content-Type': 'application/json',
         }
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            window.location.href = '/facturas';  
+            window.location.href = '/facturas';
         } else {
-            alert(data.error || 'Error al aprobar la cotización');
-        }  
+            mostrarNotificacion('Error al aprobar la cotización', 'error');
+        }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error al aprobar la cotización');
+        mostrarNotificacion('Error al aprobar la cotización', 'error');
     });
 }
 
 function rechazarCotizacion(numero) {
-    if (!confirm('¿Estás seguro de rechazar esta cotización?')) return; 
+    if (!confirm('¿Estás seguro de rechazar esta cotización?')) return;
 
     fetch(`/rechazar_cotizacion/${numero}`, {
         method: 'POST',
-        headers: { 
+        headers: {
             'Content-Type': 'application/json',
-        }   
+        }
     })
-    .then(() => {
-        realizarBusqueda(document.getElementById('searchInput').value);
-    }) 
+    .then(response => {
+        if (response.ok) {
+            mostrarNotificacion('Cotización rechazada correctamente', 'success');
+            realizarBusqueda(document.getElementById('searchInput').value);
+        } else {
+            mostrarNotificacion('Error al rechazar la cotización', 'error');
+        }
+    })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error al rechazar la cotización');
+        mostrarNotificacion('Error al rechazar la cotización', 'error');
     });
 }
 
 function eliminarCotizacion(numero) {
     if (!confirm('¿Estás seguro de eliminar esta cotización? Esta acción no se puede deshacer.')) return;
 
-    fetch(`/eliminar_cotizacion/${numero}`, { 
+    fetch(`/eliminar_cotizacion/${numero}`, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json', 
+            'Content-Type': 'application/json',
         }
-    })    
-    .then(() => {
-        realizarBusqueda(document.getElementById('searchInput').value);    
     })
-    .catch(error => { 
+    .then(response => {
+        if (response.ok) {
+            mostrarNotificacion('Cotización eliminada correctamente', 'success');
+            realizarBusqueda(document.getElementById('searchInput').value);
+        } else {
+            mostrarNotificacion('Error al eliminar la cotización', 'error');
+        }
+    })
+    .catch(error => {
         console.error('Error:', error);
-        alert('Error al eliminar la cotización'); 
+        mostrarNotificacion('Error al eliminar la cotización', 'error');
     });
-} 
+}
+
+function mostrarNotificacion(mensaje, tipo) {
+    const notificacion = document.createElement('div');
+    notificacion.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg text-white transform transition-all duration-300 translate-y-0 opacity-100 ${
+        tipo === 'success' ? 'bg-green-600' : 'bg-red-600'
+    }`;
+    notificacion.textContent = mensaje;
+    document.body.appendChild(notificacion);
+
+    setTimeout(() => {
+        notificacion.classList.add('translate-y-2', 'opacity-0');
+        setTimeout(() => notificacion.remove(), 300);
+    }, 3000);
+}
 </script>
 {% endblock %}

@@ -156,6 +156,14 @@ def register_routes(app):
         db.session.commit()
         return jsonify({'success': True})
 
+    @app.route('/eliminar_factura/<numero>', methods=['DELETE'])
+    @login_required
+    def eliminar_factura(numero):
+        factura = Factura.query.filter_by(numero=numero).first_or_404()
+        db.session.delete(factura)
+        db.session.commit()
+        return jsonify({'success': True})
+
     @app.route('/aprobar_cotizacion/<numero>', methods=['POST'])
     @login_required
     def aprobar_cotizacion(numero):
