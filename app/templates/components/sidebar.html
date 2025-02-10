@@ -22,13 +22,20 @@
                         <i class="fas fa-file-invoice w-5 h-5 mr-3 text-gray-400 group-hover:text-indigo-600"></i>
                         Cotizaciones
                     </span>
-                    <i class="fas fa-chevron-down text-xs text-gray-400" :class="{'rotate-180': open}"></i>
+                    <i class="fas fa-chevron-down text-xs text-gray-400 transition-transform duration-200" :class="{'rotate-180': open}"></i>
                 </button>
                 
-                <div x-show="open" x-collapse class="mt-1 ml-3 space-y-1 bg-white rounded-md shadow-md border border-gray-200">
-                    <a href="{{ url_for('formulario_empresa') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-indigo-600">Empresa</a>
-                    <a href="{{ url_for('formulario_natural') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-indigo-600">Natural</a>
-                    <a href="{{ url_for('buscar') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-indigo-600">Búsqueda</a>
+                <!-- Menú desplegable -->
+                <div x-show="open" x-transition.opacity x-cloak class="absolute left-0 mt-1 w-full bg-white rounded-md shadow-md border border-gray-200">
+                    <a href="{{ url_for('formulario_empresa') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-indigo-600">
+                        Empresa
+                    </a>
+                    <a href="{{ url_for('formulario_natural') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-indigo-600">
+                        Natural
+                    </a>
+                    <a href="{{ url_for('buscar') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-indigo-600">
+                        Búsqueda
+                    </a>
                 </div>
             </div>
 
