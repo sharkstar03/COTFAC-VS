@@ -12,6 +12,7 @@
         <!-- Menú Principal -->
         <h3 class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Menú Principal</h3>
         <div class="space-y-1">
+            <!-- Dashboard -->
             <a href="{{ url_for('dashboard') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 hover:text-indigo-600 transition">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3 text-gray-400 group-hover:text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -20,9 +21,9 @@
             </a>
 
             <!-- Dropdown Cotizaciones -->
-            <div x-data="{ open: false }" class="relative">
+            <div x-data="{ open: false }" @click.away="open = false" class="relative">
                 <button 
-                    @click="open = !open" 
+                    @click="open = !open; $dispatch('close-other-dropdowns', 'cotizaciones')" 
                     class="flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 hover:text-indigo-600 transition"
                 >
                     <span class="flex items-center">
@@ -38,12 +39,16 @@
                     </svg>
                 </button>
 
-                <!-- Menú desplegable -->
                 <div 
                     x-show="open" 
-                    x-transition 
-                    x-cloak 
-                    class="absolute left-0 mt-1 w-full bg-white rounded-md shadow-md border border-gray-200 z-10"
+                    x-transition:enter="transition ease-out duration-100"
+                    x-transition:enter-start="transform opacity-0 scale-95"
+                    x-transition:enter-end="transform opacity-100 scale-100"
+                    x-transition:leave="transition ease-in duration-75"
+                    x-transition:leave-start="transform opacity-100 scale-100"
+                    x-transition:leave-end="transform opacity-0 scale-95"
+                    class="absolute left-0 right-0 mt-1 bg-white rounded-md shadow-lg border border-gray-200 z-20"
+                    @close-other-dropdowns.window="if ($event.detail !== 'cotizaciones') open = false"
                 >
                     <a href="{{ url_for('formulario_empresa') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-indigo-600">
                         Empresa
@@ -57,35 +62,183 @@
                 </div>
             </div>
 
-            <a href="{{ url_for('facturas') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 hover:text-indigo-600 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3 text-gray-400 group-hover:text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a.5.5 0 11-1 0 .5.5 0 011 0z" />
-                </svg>
-                Facturas
-            </a>
-        </div>
+            <!-- Dropdown Facturas -->
+            <div x-data="{ open: false }" @click.away="open = false" class="relative">
+                <button 
+                    @click="open = !open; $dispatch('close-other-dropdowns', 'facturas')" 
+                    class="flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 hover:text-indigo-600 transition"
+                >
+                    <span class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3 text-gray-400 group-hover:text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
+                        </svg>
+                        Facturas
+                    </span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400 transition-transform duration-200" 
+                         :class="{'rotate-180': open}" 
+                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
 
-        <!-- Herramientas -->
-        <div class="border-t border-gray-200 mt-4 pt-4">
-            <h3 class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Herramientas</h3>
-            <div class="space-y-1">
-                <a href="{{ url_for('configuracion') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 hover:text-indigo-600 transition">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3 text-gray-400 group-hover:text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <div 
+                    x-show="open" 
+                    x-transition:enter="transition ease-out duration-100"
+                    x-transition:enter-start="transform opacity-0 scale-95"
+                    x-transition:enter-end="transform opacity-100 scale-100"
+                    x-transition:leave="transition ease-in duration-75"
+                    x-transition:leave-start="transform opacity-100 scale-100"
+                    x-transition:leave-end="transform opacity-0 scale-95"
+                    class="absolute left-0 right-0 mt-1 bg-white rounded-md shadow-lg border border-gray-200 z-20"
+                    @close-other-dropdowns.window="if ($event.detail !== 'facturas') open = false"
+                >
+                    <a href="{{ url_for('facturas') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-indigo-600">
+                        Ver Factura
+                    </a>
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-indigo-600">
+                        Búsqueda Avanzada
+                    </a>
+                </div>
+            </div>
+
+            <!-- Dropdown Contabilidad -->
+            <div x-data="{ open: false, subMenuExcel: false }" @click.away="open = false; subMenuExcel = false" class="relative">
+                <button 
+                    @click="open = !open; $dispatch('close-other-dropdowns', 'contabilidad')" 
+                    class="flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 hover:text-indigo-600 transition"
+                >
+                    <span class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3 text-gray-400 group-hover:text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                        Contabilidad
+                    </span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400 transition-transform duration-200" 
+                         :class="{'rotate-180': open}" 
+                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                     </svg>
-                    Configuración
-                </a>
-                <a href="{{ url_for('logout') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-red-600 hover:bg-red-50 hover:text-red-700 transition">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3 text-red-500 group-hover:text-red-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                    Cerrar Sesión
-                </a>
+                </button>
+
+                <div 
+                    x-show="open" 
+                    x-transition:enter="transition ease-out duration-100"
+                    x-transition:enter-start="transform opacity-0 scale-95"
+                    x-transition:enter-end="transform opacity-100 scale-100"
+                    x-transition:leave="transition ease-in duration-75"
+                    x-transition:leave-start="transform opacity-100 scale-100"
+                    x-transition:leave-end="transform opacity-0 scale-95"
+                    class="absolute left-0 right-0 mt-1 bg-white rounded-md shadow-lg border border-gray-200 z-20"
+                    @close-other-dropdowns.window="if ($event.detail !== 'contabilidad') { open = false; subMenuExcel = false }"
+                >
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-indigo-600">
+                        Resumen Contable
+                    </a>
+                    <!-- Nested Excel Options -->
+                    <div class="relative">
+                        <button 
+                            @click="subMenuExcel = !subMenuExcel" 
+                            class="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-indigo-600"
+                        >
+                            <span>Exportar</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400 transition-transform duration-200" 
+                                 :class="{'rotate-90': subMenuExcel}" 
+                                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
+                        
+                        <div 
+                            x-show="subMenuExcel"
+                            x-transition:enter="transition ease-out duration-100"
+                            x-transition:enter-start="transform opacity-0"
+                            x-transition:enter-end="transform opacity-100"
+                            x-transition:leave="transition ease-in duration-75"
+                            x-transition:leave-start="transform opacity-100"
+                            x-transition:leave-end="transform opacity-0"
+                            class="bg-gray-50"
+                        >
+                            <a href="#" class="block px-6 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-indigo-600">
+                                Facturas (Excel)
+                            </a>
+                            <a href="#" class="block px-6 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-indigo-600">
+                                Cotizaciones (Excel)
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Herramientas -->
+            <div class="border-t border-gray-200 mt-4 pt-4">
+                <h3 class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Herramientas</h3>
+                <div class="space-y-1">
+                    <a href="{{ url_for('configuracion') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 hover:text-indigo-600 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3 text-gray-400 group-hover:text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        Configuración
+                    </a>
+                    <a href="{{ url_for('logout') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-red-600 hover:bg-red-50 hover:text-red-700 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3 text-red-500 group-hover:text-red-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        Cerrar Sesión
+                    </a>
+                </div>
             </div>
         </div>
     </nav>
 </div>
 
-<!-- Alpine.js Script con CDN -->
-<script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+<!-- Script Alpine.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.5/cdn.min.js" defer></script>
+
+<style>
+    /* Estilos para el manejo de dropdowns */
+    [x-cloak] { 
+        display: none !important; 
+    }
+
+    /* Aseguramos que los dropdowns no se superpongan */
+    .relative {
+        position: relative;
+    }
+
+    /* Control de z-index para los dropdowns */
+    .relative:hover {
+        z-index: 30;
+    }
+
+    /* Transiciones suaves */
+    .transition-transform {
+        transition-property: transform;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 200ms;
+    }
+
+    /* Estilos para el scroll del menú */
+    nav.overflow-y-auto::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    nav.overflow-y-auto::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    nav.overflow-y-auto::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 2px;
+    }
+
+    nav.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+    /* Ajustes para el submenú de Excel */
+    .bg-gray-50 {
+        position: relative;
+        z-index: 25;
+    }
+</style>
