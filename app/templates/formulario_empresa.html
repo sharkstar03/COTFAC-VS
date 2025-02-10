@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+{% block title %}Cotización Empresarial{% endblock %}
+
+{% block content %}
+<div class="flex min-h-screen bg-gray-100">
+    <!-- Sidebar -->
+    <div class="w-72 bg-white shadow-md">
+        {% include 'components/sidebar.html' %}
+    </div>
+    
+    <!-- Main Content -->
+    <div class="flex-1 p-10 relative">
+        <div class="mb-6 flex justify-between items-center">
+            <h1 class="text-3xl font-semibold text-gray-900">Nueva Cotización Empresarial</h1>
+            <a href="{{ url_for('select_type') }}" class="bg-gray-200 text-gray-700 px-5 py-3 rounded-lg hover:bg-gray-300">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-lg p-8">
+            <form id="quotation-form" action="{{ url_for('generate_pdf_empresa') }}" method="POST" class="space-y-8">
+                <!-- Información del cliente -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <label for="nombre" class="block text-lg font-medium text-gray-700">Nombre del Cliente</label>
+                        <input id="nombre" type="text" name="nombre" placeholder="Ej: Juan Pérez" autocomplete="off" required class="mt-2 block w-full rounded-lg border-gray-300 shadow-sm px-4 py-3 focus:border-indigo-500 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label for="empresa" class="block text-lg font-medium text-gray-700">Empresa</label>
+                        <input id="empresa" type="text" name="empresa" placeholder="Ej: ACME Corp" autocomplete="off" required class="mt-2 block w-full rounded-lg border-gray-300 shadow-sm px-4 py-3 focus:border-indigo-500 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label for="telefono" class="block text-lg font-medium text-gray-700">Teléfono</label>
+                        <input id="telefono" type="tel" name="telefono" placeholder="Ej: +507 6000-0000" required class="mt-2 block w-full rounded-lg border-gray-300 shadow-sm px-4 py-3 focus:border-indigo-500 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label for="correo" class="block text-lg font-medium text-gray-700">Correo</label>
+                        <input id="correo" type="email" name="correo" placeholder="Ej: cliente@correo.com" required class="mt-2 block w-full rounded-lg border-gray-300 shadow-sm px-4 py-3 focus:border-indigo-500 focus:ring-indigo-500">
+                    </div>
+                    <div class="col-span-2">
+                        <label for="direccion" class="block text-lg font-medium text-gray-700">Dirección</label>
+                        <input id="direccion" type="text" name="direccion" placeholder="Ej: Calle 50, Ciudad, País" required class="mt-2 block w-full rounded-lg border-gray-300 shadow-sm px-4 py-3 focus:border-indigo-500 focus:ring-indigo-500">
+                    </div>
+                </div>
+
+                <!-- Items Table -->
+                <div class="mt-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-medium text-gray-900">Items</h3>
+                        <button type="button" id="agregar-item" class="bg-indigo-600 text-white px-5 py-3 rounded-lg hover:bg-indigo-700">
+                            <i class="fas fa-plus"></i> Agregar Item
+                        </button>
+                    </div>
+                    <div id="items-container" class="space-y-6">
+                        <!-- Initial item row -->
+                        <div class="grid grid-cols-12 gap-6 items-center bg-white p-4 rounded-lg shadow-md item-row">
+                            <div class="col-span-5">
+                                <input type="text" name="descripcion[]" placeholder="Descripción" required class="block w-full rounded-lg border-gray-300 shadow-sm px-4 py-3 focus:border-indigo-500 focus:ring-indigo-500">
+                            </div>
+                            <div class="col-span-2">
+                                <input type="number" name="precio_unitario[]" placeholder="Precio" min="0" step="0.01" required class="block w-full rounded-lg border-gray-300 shadow-sm px-4 py-3 focus:border-indigo-500 focus:ring-indigo-500">
+                            </div>
+                            <div class="col-span-2">
+                                <input type="number" name="unidades[]" placeholder="Cantidad" min="1" required class="block w-full rounded-lg border-gray-300 shadow-sm px-4 py-3 focus:border-indigo-500 focus:ring-indigo-500">
+                            </div>
+                            <div class="col-span-2 text-right">
+                                <span class="item-total font-semibold">$0.00</span>
+                            </div>
+                            <div class="col-span-1">
+                                <button type="button" class="remove-item text-red-600 hover:text-red-800">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Totals Section Floating Box -->
+                <div class="fixed bottom-5 right-10 bg-white shadow-lg p-6 rounded-lg border border-gray-200 z-50">
+                    <h3 class="text-xl font-medium text-gray-900 mb-4">Resumen</h3>
+                    <div class="flex justify-between text-lg">
+                        <span>Subtotal:</span>
+                        <span id="subtotal">$0.00</span>
+                    </div>
+                    <div class="flex justify-between text-lg">
+                        <span>ITBMS (7%):</span>
+                        <span id="itbms">$0.00</span>
+                    </div>
+                    <div class="flex justify-between font-bold text-2xl mt-2">
+                        <span>Total:</span>
+                        <span id="total">$0.00</span>
+                    </div>
+                </div>
+
+                <!-- Submit Buttons -->
+                <div class="mt-8 flex justify-end space-x-6">
+                    <button type="button" id="cancelar" class="bg-gray-200 text-gray-700 px-5 py-3 rounded-lg hover:bg-gray-300">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="bg-indigo-600 text-white px-5 py-3 rounded-lg hover:bg-indigo-700">
+                        Generar Cotización
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const itemsContainer = document.getElementById('items-container');
+    const agregarItemBtn = document.getElementById('agregar-item');
+    const cancelarBtn = document.getElementById('cancelar');
+
+    // Cancelar button returns to select type page
+    cancelarBtn.addEventListener('click', function() {
+        window.location.href = '{{ url_for("select_type") }}';
+    });
+
+    // Add new item row
+    agregarItemBtn.addEventListener('click', function() {
+        const newItemRow = document.createElement('div');
+        newItemRow.className = 'grid grid-cols-12 gap-6 items-center bg-white p-4 rounded-lg shadow-md item-row';
+        newItemRow.innerHTML = `
+            <div class="col-span-5">
+                <input type="text" name="descripcion[]" placeholder="Descripción" required class="block w-full rounded-lg border-gray-300 shadow-sm px-4 py-3 focus:border-indigo-500 focus:ring-indigo-500">
+            </div>
+            <div class="col-span-2">
+                <input type="number" name="precio_unitario[]" placeholder="Precio" min="0" step="0.01" required class="block w-full rounded-lg border-gray-300 shadow-sm px-4 py-3 focus:border-indigo-500 focus:ring-indigo-500">
+            </div>
+            <div class="col-span-2">
+                <input type="number" name="unidades[]" placeholder="Cantidad" min="1" required class="block w-full rounded-lg border-gray-300 shadow-sm px-4 py-3 focus:border-indigo-500 focus:ring-indigo-500">
+            </div>
+            <div class="col-span-2 text-right">
+                <span class="item-total font-semibold">$0.00</span>
+            </div>
+            <div class="col-span-1">
+                <button type="button" class="remove-item text-red-600 hover:text-red-800">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        `;
+        itemsContainer.appendChild(newItemRow);
+        
+        // Add event listeners to new row
+        newItemRow.querySelector('[name="precio_unitario[]"]').addEventListener('input', calcularTotales);
+        newItemRow.querySelector('[name="unidades[]"]').addEventListener('input', calcularTotales);
+        newItemRow.querySelector('.remove-item').addEventListener('click', function() {
+            newItemRow.remove();
+            calcularTotales();
+        });
+    });
+
+    // Remove existing items
+    itemsContainer.addEventListener('click', function(e) {
+        if (e.target.closest('.remove-item')) {
+            const itemRow = e.target.closest('.item-row');
+            if (itemsContainer.querySelectorAll('.item-row').length > 1) {
+                itemRow.remove();
+                calcularTotales();
+            } else {
+                alert('Debe haber al menos un item en la cotización');
+            }
+        }
+    });
+
+    // Calculate totals when inputs change
+    itemsContainer.addEventListener('input', function(e) {
+        if (e.target.name === 'precio_unitario[]' || e.target.name === 'unidades[]') {
+            calcularTotales();
+        }
+    });
+
+    // Initial calculation
+    calcularTotales();
+
+    // Totals calculation function
+    function calcularTotales() {
+        let subtotal = 0;
+        const itemRows = document.querySelectorAll('.item-row');
+
+        itemRows.forEach(row => {
+            const precioInput = row.querySelector('[name="precio_unitario[]"]');
+            const unidadesInput = row.querySelector('[name="unidades[]"]');
+            const itemTotalSpan = row.querySelector('.item-total');
+
+            const precio = parseFloat(precioInput.value) || 0;
+            const unidades = parseInt(unidadesInput.value) || 0;
+            const itemTotal = precio * unidades;
+
+            itemTotalSpan.textContent = `$${itemTotal.toFixed(2)}`;
+            subtotal += itemTotal;
+        });
+
+        const itbms = subtotal * 0.07;
+        const total = subtotal + itbms;
+
+        document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
+        document.getElementById('itbms').textContent = `$${itbms.toFixed(2)}`;
+        document.getElementById('total').textContent = `$${total.toFixed(2)}`;
+    }
+
+    // Form validation before submission
+    document.getElementById('quotation-form').addEventListener('submit', function(e) {
+        const itemRows = document.querySelectorAll('.item-row');
+        let isValid = true;
+
+        itemRows.forEach(row => {
+            const descripcion = row.querySelector('[name="descripcion[]"]');
+            const precio = row.querySelector('[name="precio_unitario[]"]');
+            const unidades = row.querySelector('[name="unidades[]"]');
+
+            if (!descripcion.value.trim()) {
+                descripcion.classList.add('border-red-500');
+                isValid = false;
+            } else {
+                descripcion.classList.remove('border-red-500');
+            }
+
+            if (precio.value <= 0) {
+                precio.classList.add('border-red-500');
+                isValid = false;
+            } else {
+                precio.classList.remove('border-red-500');
+            }
+
+            if (unidades.value <= 0) {
+                unidades.classList.add('border-red-500');
+                isValid = false;
+            } else {
+                unidades.classList.remove('border-red-500');
+            }
+        });
+
+        if (!isValid) {
+            e.preventDefault();
+            alert('Por favor, complete todos los campos correctamente');
+        }
+    });
+});
+</script>
+{% endblock %}
