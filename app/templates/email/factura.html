@@ -1,0 +1,36 @@
+{% extends "email/base_email.html" %}
+
+{% block title %}
+    Factura #{{ factura.numero }}
+{% endblock %}
+
+{% block content %}
+    <p>Estimado/a {{ factura.cotizacion.nombre }},</p>
+
+    <p>Adjunto encontrará la factura correspondiente a la cotización {{ factura.cotizacion.numero }}.</p>
+
+    <div class="info-box">
+        <h3>Detalles de la Factura:</h3>
+        <p><strong>Número:</strong> {{ factura.numero }}</p>
+        <p><strong>Fecha:</strong> {{ factura.fecha.strftime('%d/%m/%Y') }}</p>
+        <p><strong>Total:</strong> ${{ "%.2f"|format(factura.total) }}</p>
+    </div>
+
+    <h4>Métodos de Pago:</h4>
+    <div class="info-box">
+        <p><strong>Banco General</strong></p>
+        <p>Cuenta N°: 04-72-98-21-23-33-0</p>
+        <p>Tipo: Ahorro</p>
+        <p>Titular: Vionel Angulo</p>
+        <p>Yappy: 6734-0816</p>
+    </div>
+
+    <p>Por favor, realice el pago lo antes posible y envíenos el comprobante de pago.</p>
+
+    <p>Si ya realizó el pago, por favor ignore este mensaje.</p>
+
+    <p>Gracias por su preferencia.</p>
+
+    <p>Saludos cordiales,<br>
+    VIANG SOLUTION</p>
+{% endblock %}

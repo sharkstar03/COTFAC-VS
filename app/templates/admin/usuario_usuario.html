@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="flex min-h-screen bg-gray-50">
+    {% include 'components/sidebar.html' %}
+    
+    <div class="flex-1 p-8 ml-64">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">
+                {{ 'Editar Usuario' if usuario else 'Nuevo Usuario' }}
+            </h1>
+            <p class="text-gray-600 mt-2">
+                {{ 'Modifique los datos del usuario' if usuario else 'Complete el formulario para crear un nuevo usuario' }}
+            </p>
+        </div>
+
+        <div class="max-w-2xl bg-white rounded-xl shadow-md p-8">
+            <form method="POST" class="space-y-6">
+                {{ form.csrf_token }}
+                
+                <div>
+                    <label for="username" class="block text-sm font-medium text-gray-700">Nombre de Usuario</label>
+                    <div class="mt-1">
+                        {{ form.username(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500") }}
+                    </div>
+                    {% if form.username.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.username.errors[0] }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <div class="mt-1">
+                        {{ form.email(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500") }}
+                    </div>
+                    {% if form.email.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.email.errors[0] }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700">
+                        {{ 'Nueva Contraseña' if usuario else 'Contraseña' }}
+                    </label>
+                    <div class="mt-1">
+                        {{ form.password(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500") }}
+                    </div>
+                    {% if usuario %}
+                    <p class="mt-1 text-sm text-gray-500">Dejar en blanco para mantener la contraseña actual</p>
+                    {% endif %}
+                    {% if form.password.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.password.errors[0] }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="flex items-center">
+                    {{ form.is_admin(class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded") }}
+                    <label for="is_admin" class="ml-2 block text-sm text-gray-900">
+                        Es administrador
+                    </label>
+                </div>
+
+                <div class="flex justify-end space-x-4 pt-6">
+                    <a href="{{ url_for('admin.usuarios') }}" 
+                       class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Cancelar
+                    </a>
+                    <button type="submit"
+                            class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        {{ 'Guardar Cambios' if usuario else 'Crear Usuario' }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="flex min-h-screen bg-gray-50">
+    {% include 'components/sidebar.html' %}
+    
+    <div class="flex-1 p-8 ml-64">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Panel de Administración</h1>
+            <p class="text-gray-600 mt-2">Gestione los usuarios y la configuración del sistema</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Tarjeta de Usuarios -->
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800">Usuarios</h2>
+                    <i class="fas fa-users text-indigo-600 text-2xl"></i>
+                </div>
+                <p class="text-3xl font-bold text-gray-900">{{ usuarios_count }}</p>
+                <a href="{{ url_for('admin.usuarios') }}" class="mt-4 inline-flex items-center text-indigo-600 hover:text-indigo-800">
+                    Gestionar usuarios <i class="fas fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+
+            <!-- Tarjeta de Configuración -->
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800">Configuración</h2>
+                    <i class="fas fa-cogs text-indigo-600 text-2xl"></i>
+                </div>
+                <p class="text-sm text-gray-600">Gestione la configuración general del sistema</p>
+                <a href="{{ url_for('config.configuracion') }}" class="mt-4 inline-flex items-center text-indigo-600 hover:text-indigo-800">
+                    Ir a configuración <i class="fas fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+
+            <!-- Tarjeta de Backups -->
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800">Respaldos</h2>
+                    <i class="fas fa-database text-indigo-600 text-2xl"></i>
+                </div>
+                <p class="text-sm text-gray-600">Gestione los respaldos de la base de datos</p>
+                <a href="#" class="mt-4 inline-flex items-center text-indigo-600 hover:text-indigo-800">
+                    Gestionar respaldos <i class="fas fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Sección de Estadísticas -->
+        <div class="mt-8">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-6">Estadísticas del Sistema</h2>
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500">Total Cotizaciones</h3>
+                        <p class="text-2xl font-bold text-gray-900">{{ stats.total_cotizaciones }}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500">Total Facturas</h3>
+                        <p class="text-2xl font-bold text-gray-900">{{ stats.total_facturas }}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500">Facturas Pendientes</h3>
+                        <p class="text-2xl font-bold text-gray-900">{{ stats.facturas_pendientes }}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500">Total Ventas</h3>
+                        <p class="text-2xl font-bold text-gray-900">{{ stats.total_ventas }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

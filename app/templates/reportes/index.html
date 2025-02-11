@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="flex min-h-screen bg-gray-50">
+    {% include 'components/sidebar.html' %}
+    
+    <div class="flex-1 p-8 ml-64">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Reportes y Estadísticas</h1>
+            <p class="text-gray-600 mt-2">Visualice y exporte sus datos de ventas</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Reporte de Ventas -->
+            <a href="{{ url_for('reportes.ventas') }}" 
+               class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800">Ventas</h2>
+                    <i class="fas fa-chart-line text-indigo-600 text-2xl"></i>
+                </div>
+                <p class="text-sm text-gray-600">Análisis detallado de ventas por período</p>
+            </a>
+
+            <!-- Reporte de Clientes -->
+            <a href="{{ url_for('reportes.clientes') }}"
+               class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800">Clientes</h2>
+                    <i class="fas fa-users text-indigo-600 text-2xl"></i>
+                </div>
+                <p class="text-sm text-gray-600">Análisis de clientes y comportamiento</p>
+            </a>
+
+            <!-- Reporte de Productos -->
+            <a href="{{ url_for('reportes.productos') }}"
+               class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800">Productos</h2>
+                    <i class="fas fa-box text-indigo-600 text-2xl"></i>
+                </div>
+                <p class="text-sm text-gray-600">Análisis de productos más vendidos</p>
+            </a>
+        </div>
+
+        <!-- Resumen General -->
+        <div class="mt-8">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-6">Resumen General</h2>
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500">Ventas del Mes</h3>
+                        <p class="text-2xl font-bold text-gray-900">{{ stats.ventas_mes }}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500">Cotizaciones del Mes</h3>
+                        <p class="text-2xl font-bold text-gray-900">{{ stats.cotizaciones_mes }}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500">Clientes Nuevos</h3>
+                        <p class="text-2xl font-bold text-gray-900">{{ stats.clientes_nuevos }}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500">Productos Vendidos</h3>
+                        <p class="text-2xl font-bold text-gray-900">{{ stats.productos_vendidos }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
